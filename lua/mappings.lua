@@ -2,7 +2,7 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
-map("i", "<C-l>", "<Right>")
+-- map("i", "<C-l>", "<Right>")
 
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "ei", "<ESC>")
