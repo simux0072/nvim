@@ -136,8 +136,7 @@ return {
     dependencies = { "mfussenegger/nvim-dap", "rcarriga/nvim-dap-ui" },
     config = function()
       -- Automatically use the debugpy installation from Mason
-      local path = vim.fn.stdpath "data" .. "/mason/packages/debugpy/venv/bin/python"
-      require("dap-python").setup(path)
+      require("dap-python").setup "debugpy-adapter"
     end,
   },
 
@@ -187,6 +186,169 @@ return {
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
+    },
+  },
+
+  -- Seamless navigation between Neovim windows and tmux panes.
+  {
+    "mrjones2014/smart-splits.nvim",
+    lazy = false,
+    opts = {
+      at_edge = "stop",
+      default_amount = 3,
+    },
+  },
+
+  -- Project-aware Neovim sessions. Sessions are saved automatically after a
+  -- real file is opened, but restored only when explicitly requested.
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    opts = {},
+    keys = {
+      {
+        "<leader>qs",
+        function()
+          require("persistence").load()
+        end,
+        desc = "Restore project session",
+      },
+      {
+        "<leader>qS",
+        function()
+          require("persistence").select()
+        end,
+        desc = "Select session",
+      },
+      {
+        "<leader>ql",
+        function()
+          require("persistence").load { last = true }
+        end,
+        desc = "Restore last session",
+      },
+      {
+        "<leader>qd",
+        function()
+          require("persistence").stop()
+        end,
+        desc = "Do not save this session",
+      },
+    },
+  },
+
+  -- Label-based jumps within and across windows.
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash jump",
+      },
+      {
+        "S",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Flash Treesitter",
+      },
+      {
+        "r",
+        mode = "o",
+        function()
+          require("flash").remote()
+        end,
+        desc = "Remote Flash",
+      },
+      {
+        "R",
+        mode = { "o", "x" },
+        function()
+          require("flash").treesitter_search()
+        end,
+        desc = "Flash Treesitter search",
+      },
+      {
+        "<C-s>",
+        mode = "c",
+        function()
+          require("flash").toggle()
+        end,
+        desc = "Toggle Flash search",
+      },
+    },
+  },
+
+  -- Test runner UI. The Python adapter supports pytest and unittest and can
+  -- use a project's uv/.venv environment when one is present.
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-neotest/neotest-python",
+    },
+    opts = function()
+      return {
+        adapters = {
+          require "neotest-python" {
+            dap = { justMyCode = false },
+          },
+        },
+      }
+    end,
+    keys = {
+      {
+        "<leader>tn",
+        function()
+          require("neotest").run.run()
+        end,
+        desc = "Test nearest",
+      },
+      {
+        "<leader>tf",
+        function()
+          require("neotest").run.run(vim.fn.expand "%")
+        end,
+        desc = "Test file",
+      },
+      {
+        "<leader>td",
+        function()
+          require("neotest").run.run { strategy = "dap" }
+        end,
+        desc = "Debug nearest test",
+      },
+      {
+        "<leader>ts",
+        function()
+          require("neotest").summary.toggle()
+        end,
+        desc = "Toggle test summary",
+      },
+      {
+        "<leader>to",
+        function()
+          require("neotest").output.open { enter = true }
+        end,
+        desc = "Open test output",
+      },
+      {
+        "<leader>tw",
+        function()
+          require("neotest").watch.toggle(vim.fn.expand "%")
+        end,
+        desc = "Watch test file",
+      },
     },
   },
 }
